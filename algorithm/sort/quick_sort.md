@@ -1,52 +1,83 @@
-# java反射
+# 快速排序
 
-java中的三种反射用法
 
-* ReflectMock.class
-* Class.forName("ReflectMock")
-* object.getClass()
-
-三种方式都可以得到类的结构信息，但是在执行过程中会有一定的区别
-
-示例如下：
-1. 新建一个类ReflectMock
 ```java
-public class ReflectMock {
-    
-    static {
-        System.out.println("Static block");
+public class QuickSort {
+
+    public int[] nums;
+
+    QuickSort(int[] nums) {
+        this.nums = nums;
     }
-    
-    ReflectMock() {
-        System.out.println("Construct block");
+
+    public void sort() {
+        sort(nums, 0, nums.length - 1);
     }
-   
+
+    public void sort(int[] nums, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+
+        int base = nums[start];
+        int left = start;
+        int right = end;
+        while (right > left) {
+            while (nums[right] >= base && right > left) {
+                right--;
+            }
+            while (nums[left] <= base && right > left) {
+                left++;
+            }
+            if (left < right) {
+                swap(nums, left, right);
+            }
+        }
+
+        swap(nums, right, start);
+        System.out.println("Start:" + start + ";End:" + end);
+        printNums();
+
+        sort(nums, start, right - 1);
+        sort(nums, right + 1, end);
+    }
+
+    public void swap(int[] nums, int l, int r) {
+        int tmp = nums[l];
+        nums[l] = nums[r];
+        nums[r] = tmp;
+    }
+
+    public void printNums() {
+        for (int i = 0; i < nums.length; i++) {
+            System.out.print(nums[i] + " ");
+        }
+        System.out.println("");
+    }
+
+    public static void main(String[] args) {
+        int nums[] = new int[]{46, 30, 82, 90, 56, 17, 95, 15, 37};
+        QuickSort sort = new QuickSort(nums);
+        sort.printNums();
+        sort.sort();
+    }
 }
 ```
 
-2. 测试类
+执行结果如下：
 ```java
-public class ReflectTest {
-    public static void main(String[] args) throws ClassNotFoundException {
-        System.out.println("--------1------------");
-        Class clz1 = ReflectMock.class;
+排序前: 46 30 82 90 56 17 95 15 37 
 
-        System.out.println("--------2------------");
-        Class clz2 = Class.forName("reflect.ReflectMock");
-
-        System.out.println("--------3------------");
-        ReflectMock mock = new ReflectMock();
-        Class clz3 = mock.getClass();
-    }
-}
+Start:0;End:8
+17 30 37 15 46 56 95 90 82 
+Start:0;End:3
+15 17 37 30 46 56 95 90 82 
+Start:2;End:3
+15 17 30 37 46 56 95 90 82 
+Start:5;End:8
+15 17 30 37 46 56 95 90 82 
+Start:6;End:8
+15 17 30 37 46 56 82 90 95 
+Start:6;End:7
+15 17 30 37 46 56 82 90 95 
 ```
-
-3. 结果如下：
-```java
---------1------------
---------2------------
-Static block
---------3------------
-Construct block
-```
-可以看到，第一种方式不会执行类的static代码块。第二种方式会执行类的static代码块。
