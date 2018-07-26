@@ -2,7 +2,7 @@
 
 java中的三种反射用法
 
-<code>
+```java
 public class ReflectMock {
     
     static {
@@ -12,8 +12,6 @@ public class ReflectMock {
     ReflectMock() {
         System.out.println("Construct block");
     }
-    
+   
 }
-</code>    
-
-#TODO
+```
