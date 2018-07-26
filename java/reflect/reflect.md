@@ -49,4 +49,4 @@ Static block
 --------3------------
 Construct block
 ```
-
+可以看到，第一种方式不会执行累的static代码块。第二种方式会执行累的static代码块。
