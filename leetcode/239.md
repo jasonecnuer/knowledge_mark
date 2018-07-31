@@ -1,52 +1,56 @@
-# java反射
+# 97. 交错字符串
 
-java中的三种反射用法
+给定三个字符串 s1, s2, s3, 验证 s3 是否是由 s1 和 s2 交错组成的。
 
-* ReflectMock.class
-* Class.forName("ReflectMock")
-* object.getClass()
-
-三种方式都可以得到类的结构信息，但是在执行过程中会有一定的区别
-
-示例如下：
-1. 新建一个类ReflectMock
+示例 1:
 ```java
-public class ReflectMock {
-    
-    static {
-        System.out.println("Static block");
-    }
-    
-    ReflectMock() {
-        System.out.println("Construct block");
-    }
-   
-}
+输入: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
+输出: true
+```
+
+示例 2:
+```java
+输入: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
+输出: false
 ```
 
 2. 测试类
 ```java
-public class ReflectTest {
-    public static void main(String[] args) throws ClassNotFoundException {
-        System.out.println("--------1------------");
-        Class clz1 = ReflectMock.class;
-
-        System.out.println("--------2------------");
-        Class clz2 = Class.forName("reflect.ReflectMock");
-
-        System.out.println("--------3------------");
-        ReflectMock mock = new ReflectMock();
-        Class clz3 = mock.getClass();
+public boolean isInterleave(String s1, String s2, String s3) {
+    if (s1.length() + s2.length() != s3.length()) {
+        return false;
     }
+    boolean[][] interleaved = new boolean[s1.length() + 1][s2.length() + 1];
+
+    //先确定取字符串的前0个字符的情况
+    interleaved[0][0] = true;
+
+    //s2取前0个字符的情况
+    for (int i = 1; i <= s1.length(); i++) {
+        if (s1.charAt(i - 1) == s3.charAt(i - 1) && interleaved[i - 1][0]) {
+            interleaved[i][0] = true;
+        }
+    }
+
+    //s1取前0个字符的情况
+    for (int j = 1; j <= s2.length(); j++) {
+        if (s2.charAt(j - 1) == s3.charAt(j - 1) && interleaved[0][j - 1]) {
+            interleaved[0][j] = true;
+        }
+    }
+
+    //剩下的情况
+    for (int i = 1; i <= s1.length(); i++) {
+        for (int j = 1; j <= s2.length(); j++) {
+            //情况一：当前s3的字符与当前s1的字符相匹配，则必须要满足s1当前字符（不包括当前字符）之前的字符串已匹配上
+            if ((s3.charAt(i + j - 1) == s1.charAt(i - 1) && interleaved[i - 1][j]) ||
+            //情况二：当前s3的字符与当前s2的字符相匹配，则必须要满足s2当前字符（不包括当前字符）之前的字符串已匹配上
+                (s3.charAt(i + j - 1) == s2.charAt(j - 1) && interleaved[i][j - 1])) {
+                interleaved[i][j] = true;
+            }
+        }
+    }
+
+    return interleaved[s1.length()][s2.length()];
 }
 ```
-
-3. 结果如下：
-```java
---------1------------
---------2------------
-Static block
---------3------------
-Construct block
-```
-可以看到，第一种方式不会执行类的static代码块。第二种方式会执行类的static代码块。
